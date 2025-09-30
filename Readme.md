@@ -1,6 +1,8 @@
 # README 
 This is the repo for the class CS 2205, Programming Language - Design and Implementation.
 
+The website this year is [web](https://jhc.sjtu.edu.cn/public/courses/CS2205/)
+
 **环境配置**
 
 一般方法：在课程网站上下载并安装Coq-Platform\~8.20\~2025.01，在vscode中安装VsCoq插件，并手动把版本调整为2.2.3更低的版本(建议0.3.9)后关闭自动更新，在插件的设置的 Vscoq Path中填入Coq-Platform\~8.20~2025\bin，就可以使用快捷键alt+→和alt+↓来运行文件。

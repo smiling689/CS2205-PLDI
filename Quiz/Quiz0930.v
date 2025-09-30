@@ -99,7 +99,11 @@ Qed.
 (** 然而，判别式不为正并不是_[quad_nonneg]_的必要条件。下面命题是一个简单的反例。*)
 
 Example quad_nonneg_1_1_0: quad_nonneg 1 1 0.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    unfold quad_nonneg.
+    intros.
+    nia.
+Qed.
 
 
 (************)
