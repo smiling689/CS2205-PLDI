@@ -304,23 +304,40 @@ Definition quad_nonneg (a b c: Z): Prop :=
 
 
 
+
 Lemma scale_quad_nonneg: forall a b c k: Z,
   k > 0 ->
   quad_nonneg a b c ->
   quad_nonneg (k * a) (k * b) (k * c).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    unfold quad_nonneg.
+    intros.
+    pose proof H0 x.
+    nia.
+Qed.
 
 Lemma descale_quad_nonneg: forall a b c k: Z,
   k > 0 ->
   quad_nonneg (k * a) (k * b) (k * c) ->
   quad_nonneg a b c.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    unfold quad_nonneg.
+    intros.
+    pose proof H0 x.
+    nia.
+Qed.
 
 Lemma plus_quad_nonneg: forall a1 b1 c1 a2 b2 c2: Z,
   quad_nonneg a1 b1 c1 ->
   quad_nonneg a2 b2 c2 ->
   quad_nonneg (a1 + a2) (b1 + b2) (c1 + c2).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros a1 b1 c1 a2 b2 c2 Hq1 Hq2 x.
+    unfold quad_nonneg in Hq1, Hq2.
+    specialize (Hq1 x).
+    specialize (Hq2 x).
+    nia.
+Qed.
 
 (** 我们知道，如果二次式的二次项系数为正且判别式不为正，那么这个二次式在自变量取遍一切
     实数的时候都恒为正。相应的性质在自变量取遍一切整数的时候自然也成立。请证明这一结
@@ -330,13 +347,20 @@ Lemma plus_quad_discriminant: forall a b c,
   a > 0 ->
   b * b - 4 * a * c <= 0 ->
   quad_nonneg a b c.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
-
+Proof.
+    intros a b c Ha Hdisc x.
+    unfold quad_nonneg.
+    pose proof sqr_pos (2 * a * x + b).
+    nia.
+Qed.
 (** 然而，判别式不为正并不是_[quad_nonneg]_的必要条件。下面命题是一个简单的反例。*)
 
 Example quad_nonneg_1_1_0: quad_nonneg 1 1 0.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
-
+Proof.
+    unfold quad_nonneg.
+    intros.
+    nia.
+Qed.
 
 (** * 逻辑连接词与逻辑命题 *)
 
@@ -427,7 +451,12 @@ Fact logic_ex5: forall {A: Type} (P Q: A -> Prop),
   (forall a: A, P a -> Q a) ->
   (forall a: A, P a) ->
   (forall a: A, Q a).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros A P Q H1 H2 a.
+    pose proof H1 a.
+    pose proof H2 a.
+    tauto.
+Qed.
 
 (************)
 (** 习题：  *)
@@ -435,11 +464,16 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 
 (** 请在Coq中证明下面结论。*)
 
+
 Fact logic_ex6: forall {A: Type} (P Q: A -> Prop) (a0: A),
   P a0 ->
   (forall a: A, P a -> Q a) ->
   Q a0.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros A P Q a0 HP Himp.
+    specialize (Himp a0 HP).
+    assumption.
+Qed.
 
 (************)
 (** 习题：  *)
@@ -451,7 +485,14 @@ Fact logic_ex7: forall {A: Type} (P Q: A -> Prop) (a0: A),
   (forall a: A, P a -> Q a -> False) ->
   Q a0 -> 
   ~ P a0.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros A P Q a0 Hnot HQ.
+    unfold not.
+    intros HP.
+    pose proof Hnot a0 HP HQ.
+    assumption.
+Qed.
+
 
 (************)
 (** 习题：  *)
@@ -462,7 +503,11 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 Fact logic_ex8: forall {A B: Type} (P Q: A -> B -> Prop),
   (forall (a: A) (b: B), P a b -> Q a b) ->
   (forall (a: A) (b: B), ~ P a b \/ Q a b).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros A B P Q H a b.
+    pose proof H a b.
+    tauto.
+Qed.
 
 (************)
 (** 习题：  *)
@@ -473,4 +518,8 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 Fact logic_ex9: forall {A B: Type} (P Q: A -> B -> Prop),
   (forall (a: A) (b: B), ~ P a b \/ Q a b) ->
   (forall (a: A) (b: B), P a b -> Q a b).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros A B P Q H a b HP.
+    pose proof H a b.
+    tauto.
+Qed.

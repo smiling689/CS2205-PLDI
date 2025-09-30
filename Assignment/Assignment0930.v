@@ -15,7 +15,13 @@ Local Open Scope Z.
 Fact logic_ex8: forall {A B: Type} (P Q: A -> B -> Prop),
   (forall (a: A) (b: B), P a b -> Q a b) ->
   (forall (a: A) (b: B), ~ P a b \/ Q a b).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros A B P Q HP a b.
+    pose proof HP a b.
+    unfold not.
+    tauto.
+Qed.
+
 
 
 (************)
@@ -27,7 +33,12 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 Fact logic_ex9: forall {A B: Type} (P Q: A -> B -> Prop),
   (forall (a: A) (b: B), ~ P a b \/ Q a b) ->
   (forall (a: A) (b: B), P a b -> Q a b).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros A B P Q H a b HP.
+    pose proof H a b.
+    unfold not in H0.
+    tauto.
+Qed.
 
 
 
@@ -40,8 +51,13 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 Fact shift_up1_eq: forall f,
   shift_up1 f = func_plus f (fun x => 1).
 Proof.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
-
+    unfold shift_up1.
+    unfold func_plus.
+    intros.
+    assert (forall x, f x + 1 = f x + 1) as H by lia.
+    reflexivity.
+Qed.
+    
 
 
 (************)
@@ -53,7 +69,10 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 Lemma const_mono: forall a: Z,
   mono (fun x => a).
 Proof.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+    unfold mono.
+    intros a x y Hxy.
+    lia.
+Qed.
 
 
 (************)
@@ -64,8 +83,12 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 
 Example cube_mono: mono (fun x => x * x * x).
 Proof.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
-
+    unfold mono.
+    intros n m Hnm.
+    replace (n * n * n) with (m * m * m - (m - n) * (m * m + n * m + n * n)) by nia.
+    assert (m * m + n * m + n * n >= 0) by nia.
+    nia.
+Qed.
 
 (************)
 (** 习题：  *)
@@ -78,9 +101,12 @@ Lemma mono_func_plus: forall f g,
   mono g ->
   mono (func_plus f g).
 Proof.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
-
-
+    unfold mono, func_plus.
+    intros f g Hf Hg n m.
+    pose proof Hf n m as Hf1.
+    pose proof Hg n m as Hg1.
+    lia.
+Qed.
 
 (************)
 (** 习题：  *)
@@ -95,4 +121,9 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
     请在Coq中定义正则表达式的语法树。*)
 
 
-
+Inductive regex: Type :=
+  | Char (c: ascii)
+  | EmptyString
+  | Union (r1 r2: regex)
+  | Concat (r1 r2: regex)
+  | Star (r: regex).

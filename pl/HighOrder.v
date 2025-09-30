@@ -89,11 +89,14 @@ Qed.
 (************)
 
 (** 请证明下面命题。*)
+(** 这里fun x => 1是一个常值函数，它的值在所有自变量下都为1。*)
 
 Fact shift_up1_eq: forall f,
   shift_up1 f = func_plus f (fun x => 1).
 Proof.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+    unfold shift_up1, func_plus.
+    reflexivity.
+Qed.
 
 
 (** * 高阶谓词 *)
@@ -140,7 +143,10 @@ Qed.
 Lemma const_mono: forall a: Z,
   mono (fun x => a).
 Proof.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+    unfold mono.
+    intros.
+    lia.
+Qed.
 
 (************)
 (** 习题：  *)
@@ -148,9 +154,15 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 
 (** 请证明立方函数是单调的。*)
 
+
 Example cube_mono: mono (fun x => x * x * x).
 Proof.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+    unfold mono.
+    intros n m Hnm.
+    replace (n * n * n) with (m * m * m - (m - n) * (m * m + n * m + n * n)) by nia.
+    assert (m * m + n * m + n * n >= 0) by nia.
+    nia.
+Qed.
 
 (************)
 (** 习题：  *)
@@ -163,7 +175,12 @@ Lemma mono_func_plus: forall f g,
   mono g ->
   mono (func_plus f g).
 Proof.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+    unfold mono, func_plus.
+    intros f g Hf Hg n m.
+    pose proof Hf n m as Hf1.
+    pose proof Hg n m as Hg1.
+    lia.
+Qed.
 
 (** “结合律”也是一个常用的数学概念。如下面定义所示，一个二元函数_[f]_具有结合律，当且
     仅当它满足_[f x (f y z) = f (f x y) z]_。*)
@@ -187,7 +204,10 @@ Proof. unfold assoc. nia. Qed.
 (** 请证明，我们先前定义的_[smul]_函数也符合结合律。*)
 Lemma smul_assoc: assoc smul.
 Proof.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+    unfold assoc, smul.
+    intros x y z.
+    nia.
+Qed.
 
 (** 上面例子中的两个高阶谓词都是以函数为参数的高阶谓词，下面两个例子都是以谓词为参数的
     高阶谓词，甚至它们的参数本身也是高阶谓词。它们分别说的是，函数的性质_[P]_能被图像上
@@ -227,10 +247,20 @@ Definition univ_nonneg {A: Type} (f: A -> Z): Prop :=
   forall a: A, f a >= 0.
 
 Lemma univ_nonneg_pu: preserved_by_shifting_up univ_nonneg.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    unfold preserved_by_shifting_up, univ_nonneg, shift_up1.
+    intros.
+    pose proof H a.
+    lia.
+Qed.
 
 Lemma univ_nonneg_pl: preserved_by_shifting_left univ_nonneg.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    unfold preserved_by_shifting_left, univ_nonneg, shift_left1.
+    intros.
+    pose proof H (a+1).
+    lia.
+Qed.
 
 (** 在数学证明中，我们往往会先证明一些具有一般性的定理或引理，并后续的证明中使用这些定
     理或引理。站在编写Coq证明脚本的角度看，使用先前已经证明的定理也可以看作对定理本身证
@@ -283,5 +313,14 @@ Qed.
 
 Example mono_ex2: mono (fun x => x * x * x + 3 * x * x + 3 * x).
 Proof.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
-
+    unfold mono.
+    intros.
+    pose proof cube_mono as H_cube.
+    intros.
+    unfold mono in H_cube.
+    pose proof H_cube (n+1) (m+1).
+    assert (n + 1 <= m + 1) by lia.
+    pose proof H0 H1.
+    assert (n * n * n + 3 * n * n + 3 * n + 1 <= m * m * m + 3 * m * m + 3 * m + 1) by nia.
+    lia.
+Qed.
