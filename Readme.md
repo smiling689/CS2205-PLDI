@@ -1,23 +1,5 @@
 # README 
-这是我们课程相关文件的repo。
-
-**获取仓库**
-
-获取本repo内容指令：
-
-```
-git clone https://github.com/liukanooo/CS2205-2025Fall.git
-cd CS2205-2025fall
-git submodule init
-git submodule update
-```
-或者使用
-```
-git clone https://github.com/liukanooo/CS2205-2025Fall.git
-cd CS2205-2025fall
-git submodule update --init --recursive
-```
-repo和子模块内提供了相关的Makefile和_CoqProject用于整个项目文件的编译。
+This is the repo for the class CS 2205, Programming Language - Design and Implementation.
 
 **环境配置**
 
