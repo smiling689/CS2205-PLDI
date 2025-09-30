@@ -3,6 +3,8 @@ Require Import Coq.ZArith.ZArith.
 Require Import Coq.micromega.Psatz.
 Local Open Scope Z.
 
+Set Printing All.
+
 (** * 整数算数运算与大小比较 *)
 
 
@@ -27,7 +29,11 @@ Fact chickens_and_rabbits: forall C R: Z,
   2 * C + 4 * R = 94 ->
   C = 23.
 
-(** 字面意思上，这个命题说的是：对于任意整数_[C]_与_[R]_，如果_[C + R = 35]_并且
+(** Z是整数的意思，->表示“如果-那么”，_forall C R: Z_表示“对于任意整数C与R”。
+    在p1->p2->Q中，p1与p2是前提，Q是结论。前提与结论都可以是任意复杂的数学命题。
+    Fact是Coq中定义数学命题的指令。只保证这是一个合法的命题，并不保证这个命题一定成立。
+
+    字面意思上，这个命题说的是：对于任意整数_[C]_与_[R]_，如果_[C + R = 35]_并且
     _[2 * C + 4 * R = 94]_，那么_[C = 23]_。其中，_[forall]_与_[->]_是Coq中描述数
     学命题的常用符号。
 
@@ -86,6 +92,12 @@ Proof. lia. Qed.
 (** 请在Coq中描述下面结论并证明：如果今年甲的年龄是乙5倍，并且5年后甲的年龄是乙的3倍，
     那么今年甲的年龄是25岁。*)
 
+Fact age_problem: forall A_B A_A: Z,
+  A_B = 5 * A_A ->
+  A_B + 5 = 3 * (A_A + 5) ->
+  A_B = 25.
+Proof. lia. Qed.
+
 
 (** 除了线性性质之外，Coq中还可以证明的一些更复杂的性质。例如下面就可以证明，任意两个整
     数的平方和总是大于它们的乘积。证明中使用的指令_[nia]_表示的是非线性整数运算
@@ -102,7 +114,11 @@ Fact sum_of_sqr2: forall x y: Z,
   x * x + y * y >= 2 * x * y.
 Proof. Fail nia. Abort.
 
-(** 这时，我们就需要编写证明脚本，给出中间证明步骤。证明过程中，可以使用Coq标准库中的结
+(** intros可以加入证明脚本中，表示“引入”待证明结论中的前提与变量。Abort表示放弃
+    证明。Fail表示期待_[nia]_指令失败。intros是为了在下面pos的时候用的
+    pose proof可以加入证明脚本中，表示“引入”一个新的前提。
+
+    这时，我们就需要编写证明脚本，给出中间证明步骤。证明过程中，可以使用Coq标准库中的结
     论，也可以使用我们自己实现证明的结论。例如，Coq标准库中，_[sqr_pos]_定理证明了任意
     一个整数_[x]_的平方都是非负数，即：
 
@@ -113,9 +129,9 @@ Proof. Fail nia. Abort.
 Fact sum_of_sqr2: forall x y: Z,
   x * x + y * y >= 2 * x * y.
 Proof.
-  intros.
-  pose proof sqr_pos (x - y).
-  nia.
+    intros.
+    pose proof sqr_pos (x - y).
+    nia.
 Qed.
 
 (** 这段证明有三个证明步骤。证明指令_[intros]_将待证明结论中的逻辑结构“对于任意整数x与
@@ -137,8 +153,8 @@ Qed.
 (** 下面这个例子说的是：如果_[x < y]_，那么_[x * x + x * y + y * y]_一定大于零。*)
 
 Fact sum_of_sqr_lt: forall x y: Z,
-  x < y ->
-  x * x + x * y + y * y > 0.
+    x < y ->
+    x * x + x * y + y * y > 0.
 
 (** 在我们学习数学知识时，我们知道_[x * x + x * y + y * y]_是恒为非负的，而且只有在
     _[x]_与_[y]_都为0的时候，这个式子才能取到0，因此，在_[x < y]_的前提下，这个式子恒
@@ -175,7 +191,10 @@ Qed.
 Example quad_ex2: forall x: Z,
   x * x + 3 * x + 4 > 0.
 Proof.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+    intros.
+    pose proof sqr_pos (2 * x + 3).
+    nia.
+Qed.
 
 
 (** * 函数与谓词 *)
@@ -190,6 +209,11 @@ Definition plus_one (x: Z): Z := x + 1.
 
     我们知道，“在1的基础上加一”结果是2，“在1的基础上加一再加一”结果是3。这些简单论断都
     可以用Coq命题表达出来并在Coq中证明。*)
+
+(** example是Coq中定义数学命题的另一条指令。意思是“例如”，表示下面的命题是一个例子。
+    unfold表示“展开”，将_[plus_one]_函数的定义展开成_[x + 1]。
+
+    *)
 
 Example One_plus_one: plus_one 1 = 2.
 Proof. unfold plus_one. lia. Qed.
@@ -236,7 +260,10 @@ Proof. unfold nonneg, square. nia. Qed.
 
 Fact nonneg_smul: forall x y: Z,
   nonneg x -> nonneg y -> nonneg (smul x y).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+  unfold nonneg, smul.
+  nia.
+Qed.
 
 (************)
 (** 习题：  *)
@@ -250,12 +277,20 @@ Definition opposite_sgn (x y: Z): Prop := x * y < 0.
 Fact opposite_sgn_plus_2: forall x,
   opposite_sgn (x + 2) x ->
   x = -1.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    unfold opposite_sgn.
+    intros.
+    nia.
+Qed.
 
 Fact opposite_sgn_odds: forall x,
   opposite_sgn (square x) x ->
   x < 0.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    unfold opposite_sgn, square.
+    intros.
+    nia.
+Qed.
 
 (************)
 (** 习题：  *)
@@ -266,6 +301,8 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 
 Definition quad_nonneg (a b c: Z): Prop :=
   forall x: Z, a * x * x + b * x + c >= 0.
+
+
 
 Lemma scale_quad_nonneg: forall a b c k: Z,
   k > 0 ->
@@ -437,4 +474,3 @@ Fact logic_ex9: forall {A B: Type} (P Q: A -> B -> Prop),
   (forall (a: A) (b: B), ~ P a b \/ Q a b) ->
   (forall (a: A) (b: B), P a b -> Q a b).
 Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
-

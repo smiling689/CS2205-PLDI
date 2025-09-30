@@ -4,6 +4,10 @@ Require Import PL.SimpleProofsAndDefs.
 Require Import PL.Syntax.
 Local Open Scope Z.
 
+
+(** 下面是一个小测验。请在Coq中证明下面结论。*)
+
+
 (************)
 (** 习题：  *)
 (************)
@@ -16,12 +20,20 @@ Definition opposite_sgn (x y: Z): Prop := x * y < 0.
 Fact opposite_sgn_plus_2: forall x,
   opposite_sgn (x + 2) x ->
   x = -1.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    unfold opposite_sgn.
+    intros.
+    nia.
+Qed.
 
 Fact opposite_sgn_odds: forall x,
   opposite_sgn (square x) x ->
   x < 0.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    unfold opposite_sgn, square.
+    intros.
+    nia.
+Qed.
 
 
 (************)
@@ -38,19 +50,35 @@ Lemma scale_quad_nonneg: forall a b c k: Z,
   k > 0 ->
   quad_nonneg a b c ->
   quad_nonneg (k * a) (k * b) (k * c).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros a b c k Hk Hq x.
+    unfold quad_nonneg in Hq.
+    specialize (Hq x).
+    nia.
+Qed.
 
 Lemma descale_quad_nonneg: forall a b c k: Z,
   k > 0 ->
   quad_nonneg (k * a) (k * b) (k * c) ->
   quad_nonneg a b c.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros a b c k Hk Hq x.
+    unfold quad_nonneg in Hq.
+    specialize (Hq x).
+    nia.
+Qed.
 
 Lemma plus_quad_nonneg: forall a1 b1 c1 a2 b2 c2: Z,
   quad_nonneg a1 b1 c1 ->
   quad_nonneg a2 b2 c2 ->
   quad_nonneg (a1 + a2) (b1 + b2) (c1 + c2).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros a1 b1 c1 a2 b2 c2 Hq1 Hq2 x.
+    unfold quad_nonneg in Hq1, Hq2.
+    specialize (Hq1 x).
+    specialize (Hq2 x).
+    nia.
+Qed.
 
 (** 我们知道，如果二次式的二次项系数为正且判别式不为正，那么这个二次式在自变量取遍一切
     实数的时候都恒为正。相应的性质在自变量取遍一切整数的时候自然也成立。请证明这一结
@@ -60,7 +88,13 @@ Lemma plus_quad_discriminant: forall a b c,
   a > 0 ->
   b * b - 4 * a * c <= 0 ->
   quad_nonneg a b c.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    unfold quad_nonneg.
+    pose proof sqr_pos (2 * a * x + b).
+    nia.
+Qed.
+
 
 (** 然而，判别式不为正并不是_[quad_nonneg]_的必要条件。下面命题是一个简单的反例。*)
 
