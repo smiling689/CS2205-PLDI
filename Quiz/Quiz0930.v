@@ -51,9 +51,9 @@ Lemma scale_quad_nonneg: forall a b c k: Z,
   quad_nonneg a b c ->
   quad_nonneg (k * a) (k * b) (k * c).
 Proof.
-    intros a b c k Hk Hq x.
-    unfold quad_nonneg in Hq.
-    specialize (Hq x).
+    unfold quad_nonneg.
+    intros.
+    pose proof H0 x.
     nia.
 Qed.
 
@@ -62,9 +62,9 @@ Lemma descale_quad_nonneg: forall a b c k: Z,
   quad_nonneg (k * a) (k * b) (k * c) ->
   quad_nonneg a b c.
 Proof.
-    intros a b c k Hk Hq x.
-    unfold quad_nonneg in Hq.
-    specialize (Hq x).
+    unfold quad_nonneg.
+    intros.
+    pose proof H0 x.
     nia.
 Qed.
 
@@ -89,7 +89,7 @@ Lemma plus_quad_discriminant: forall a b c,
   b * b - 4 * a * c <= 0 ->
   quad_nonneg a b c.
 Proof.
-    intros.
+    intros a b c Ha Hdisc x.
     unfold quad_nonneg.
     pose proof sqr_pos (2 * a * x + b).
     nia.
@@ -116,8 +116,11 @@ Fact logic_ex6: forall {A: Type} (P Q: A -> Prop) (a0: A),
   P a0 ->
   (forall a: A, P a -> Q a) ->
   Q a0.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
-
+Proof.
+    intros A P Q a0 HP Himp.
+    specialize (Himp a0 HP).
+    assumption.
+Qed.
 
 (************)
 (** 习题：  *)
@@ -129,8 +132,13 @@ Fact logic_ex7: forall {A: Type} (P Q: A -> Prop) (a0: A),
   (forall a: A, P a -> Q a -> False) ->
   Q a0 -> 
   ~ P a0.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
-
+Proof.
+    intros A P Q a0 Hnot HQ.
+    unfold not.
+    intros HP.
+    pose proof Hnot a0 HP HQ.
+    assumption.
+Qed.
 
 
 (************)
@@ -146,6 +154,32 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
       - write_char
     这几个内置函数之后，程序中就可以包含内存动态分配以及IO。下面请写出这个新语言的表达
     式与程序语句的语法定义。*)
+
+
+
+Module Lang_SimpleWhile.
+
+Inductive expr : Type :=
+    | EConst (n: Z): expr
+    | EVar (x: var_name): expr
+    | EBinop (op: binop) (e1 e2: expr): expr
+    | EUnop (op: unop) (e: expr): expr
+    | EDeref (e: expr): expr
+    | EMalloc (e: expr): expr
+    | EReadInt: expr
+    | EReadChar: expr.
+
+Inductive com : Type :=
+  | CSkip: com
+  | CAsgnVar (x: var_name) (e: expr): com
+  | CAsgnDeref (e1 e2: expr): com
+  | CSeq (c1 c2: com): com
+  | CIf (e: expr) (c1 c2: com): com
+  | CWhile (e: expr) (c: com): com
+  | CWriteInt (e: expr): com
+  | CWriteChar (e: expr): com.
+
+End Lang_SimpleWhile.
 
 
 
@@ -172,3 +206,14 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
     用_[expr_int]_。*)
 
 
+Module Lang_SimpleWhile_Parens.
+
+Inductive expr_int : Type :=
+  | EConst (n: Z): expr_int
+  | EVar (x: var_name): expr_int
+  | EAdd (e1 e2: expr_int): expr_int
+  | ESub (e1 e2: expr_int): expr_int
+  | EMul (e1 e2: expr_int): expr_int
+  | EParens (e: expr_int): expr_int.
+
+End Lang_SimpleWhile_Parens.
