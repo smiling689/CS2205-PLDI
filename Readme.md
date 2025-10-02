@@ -21,7 +21,9 @@ repo和子模块内提供了相关的Makefile和_CoqProject用于整个项目文
 
 **环境配置**
 
-一般方法：在课程网站上下载并安装Coq-Platform\~8.20\~2025.01，在vscode中安装VsCoq插件，并手动把版本调整为2.2.3更低的版本(建议0.3.9)后关闭自动更新，在插件的设置的 Vscoq Path中填入Coq-Platform\~8.20~2025\bin，就可以使用快捷键alt+→和alt+↓来运行文件。
+一般方法：在课程网站上下载并安装Coq-Platform\~8.20\~2025.01，在vscode中安装VsCoq插件，并手动把版本调整为2.2.3或更低的版本后关闭自动更新，在插件的设置的 Vscoq Path中填入Coq-Platform\~8.20~2025\bin，就可以使用快捷键alt+→和alt+↓来运行文件。
+
+如果你安装过Vscoq Legacy，则需要卸载该插件。
 
 windows需要自行提供CONFIGURE文件用于提供相关依赖的地址，请在CS2205-2025fall目录下新建一个无后缀名文件CONFIGURE，然后将coq安装的路径写入该文件中。
 
