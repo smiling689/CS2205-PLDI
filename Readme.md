@@ -78,3 +78,13 @@ make
 **/*.vo
 ```
 来实现。
+
+如果你需要修改vscoq的执行快捷键，你可以：先
+```
+Ctrl + Shift + P
+```
+打开vscode的控制面板，输入
+```
+Pereferences:Open Keyboard Shortcuts
+```
+后搜索你当前使用的快捷键，然后改变其绑定的按键组合。
