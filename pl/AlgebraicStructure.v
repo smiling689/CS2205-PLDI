@@ -4,7 +4,6 @@ Require Import Coq.Classes.RelationClasses.
 Require Import Coq.Classes.Equivalence.
 Require Import Coq.Classes.Morphisms.
 Require Import Coq.micromega.Psatz.
-Require Import PL.SimpleInductiveType.
 Local Open Scope Z.
 
 (** * 等价关系 *)
