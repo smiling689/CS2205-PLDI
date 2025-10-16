@@ -22,7 +22,12 @@ Local Open Scope Z.
 
 Fact iequiv_ex1: forall e1 e2: expr_int,
   [[e1 + e2 * 0]] ~=~ e1.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+  intros e1 e2.
+  rewrite mult_zero_equiv.
+  rewrite plus_zero_equiv.
+  reflexivity.
+Qed.
 
 
 (************)
@@ -35,6 +40,9 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 Fact iequiv_ex2: forall e1 e2 e3 e4: expr_int,
   [[((e1 + e2) + e3) + e4]] ~=~
   [[e1 + (e2 + (e3 + e4))]].
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
-
-
+Proof.
+  intros e1 e2 e3 e4.
+  rewrite <- plus_plus_assoc with (a := [[e1 + e2]]) (b := [[e3]]) (c := [[e4]]).
+  rewrite <- plus_plus_assoc with (a := [[e1]]) (b := [[e2]]) (c := [[e3 + e4]]).
+  reflexivity.
+Qed.

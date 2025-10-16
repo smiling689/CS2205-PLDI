@@ -16,6 +16,7 @@ Import Lang_SimpleWhile.
 
 (** 程序状态的定义：*)
 
+(** 状态是一个变量名到整数的映射。*)
 Definition state: Type := var_name -> Z.
 
 End StateModel_SimpleWhile1.
@@ -184,30 +185,57 @@ Qed.
 Lemma plus_plus_assoc:
   forall a b c: expr_int,
     [[ a + (b + c) ]] ~=~ [[ a + b + c ]].
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    unfold iequiv.
+    intros.
+    simpl.
+    lia.
+Qed.
 
 Lemma plus_minus_assoc:
   forall a b c: expr_int,
     [[ a + (b - c) ]] ~=~ [[ a + b - c ]].
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    unfold iequiv.
+    intros.
+    simpl.
+    lia.
+Qed.
 
 Lemma minus_plus_assoc:
   forall a b c: expr_int,
     [[ a - (b + c) ]] ~=~ [[ a - b - c ]].
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    unfold iequiv.
+    intros.
+    simpl.
+    lia.
+Qed.
 
 Lemma minus_minus_assoc:
   forall a b c: expr_int,
     [[ a - (b - c) ]] ~=~ [[ a - b + c ]].
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    unfold iequiv.
+    intros.
+    simpl.
+    lia.
+Qed.
 
 
 (** * 行为等价的性质 *)
 
 (** 整数类型表达式之间的行为等价符合下面几条重要的代数性质。*)
 
+(** 下面要证明的是，行为等价是自反的。*)
+
 #[export] Instance iequiv_refl: Reflexive iequiv.
 Proof.
+    unfold iequiv.
   unfold Reflexive, iequiv.
   intros.
   reflexivity.
@@ -229,6 +257,7 @@ Proof.
   reflexivity.
 Qed.
 
+(** 这个的意思是，行为等价是自反的。*)
 #[export] Instance iequiv_equiv: Equivalence iequiv.
 Proof.
   split.

@@ -45,6 +45,13 @@ mingw32-make --version
 ```
 mingw64-make --version
 ```
+
+首先如果子模块（比如sets）有更新，需要先
+```
+git submodule init
+git submodule update
+```
+
 正式编译之前请先计算依赖，具体指令为：（这里如果你使用其它make，请做对应替换）
 ```
 make depend
