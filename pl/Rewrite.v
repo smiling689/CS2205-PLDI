@@ -60,11 +60,18 @@ Definition power2 (f: Z -> Z -> Z) (x: Z): Z :=
 Definition power4 (f: Z -> Z -> Z) (x: Z): Z :=
   f x (f x (f x x)).
 
+  (** rewrite <- H 和 rewrite H 的区别是 
+  rewrite <- H 会将 H 的结论中的 f x 替换为 f (f x) ，
+  而 rewrite H 则是将 H 的前提中的 f x 替换为 f (f x) 。*)
 Fact power2_power2: forall f a,
   assoc f ->
   power2 f (power2 f a) = power4 f a.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
-
+Proof.
+    unfold assoc, power2, power4.
+    intros.
+    rewrite <- H.
+    reflexivity.
+Qed.
 (************)
 (** 习题：  *)
 (************)
@@ -77,6 +84,6 @@ Fact group_basic: forall (f: Z -> Z -> Z) (g: Z -> Z),
   (forall x, f 1 x = x) ->
   (forall x, f (g x) x = 1) ->
   (forall x, f x (g x) = 1).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
-
-
+Proof.
+  intros.
+  unfold assoc in H.

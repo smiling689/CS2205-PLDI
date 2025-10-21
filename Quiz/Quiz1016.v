@@ -2,6 +2,7 @@ Require Import Coq.Logic.Classical_Prop.
 Require Import Coq.Strings.String.
 Require Import Coq.ZArith.ZArith.
 Require Import Coq.micromega.Psatz.
+Require Import Coq.micromega.Lia.
 Require Import Coq.Classes.Equivalence.
 Require Import Coq.Classes.Morphisms.
 Require Import PL.AlgebraicStructure.
@@ -84,6 +85,39 @@ Definition const_sem (n: Z): state -> Z :=
 
 Definition var_sem (X: var_name): state -> Z :=
   fun s => s X.
+
+Definition neg_sem (D: state -> Z) (s: state): Z :=
+  - D s.
+
+Definition abs_sem (D: state -> Z) (s: state): Z :=
+  Z.abs (D s).
+
+Fixpoint eval_expr_int (e: expr_int): state -> Z :=
+  match e with
+  | EConst n =>
+      const_sem n
+  | EVar X =>
+      var_sem X
+  | EAdd e1 e2 =>
+      add_sem (eval_expr_int e1) (eval_expr_int e2)
+  | ESub e1 e2 =>
+      sub_sem (eval_expr_int e1) (eval_expr_int e2)
+  | EMul e1 e2 =>
+      mul_sem (eval_expr_int e1) (eval_expr_int e2)
+  | ENeg e1 =>
+      neg_sem (eval_expr_int e1)
+  | EAbs e1 =>
+      abs_sem (eval_expr_int e1)
+  end.
+
+Notation "⟦ e ⟧" := (eval_expr_int e)
+  (at level 0, e custom prog_lang_entry at level 99).
+
+Definition iequiv (e1 e2: expr_int): Prop :=
+  (⟦ e1 ⟧ == ⟦ e2 ⟧)%func.
+
+Notation "e1 '~=~' e2" := (iequiv e1 e2)
+  (at level 69, no associativity).
 
 
 (** 第二步：请你基于上述语义算子（包括提供给你的算子以及你自己定义的算子）定义新的整数
@@ -179,6 +213,29 @@ Proof.
   reflexivity.
 Qed.
 
+#[export] Instance neg_sem_congr:
+  Proper (func_equiv _ _ ==> func_equiv _ _) neg_sem.
+Proof.
+  unfold Proper, respectful,
+         func_equiv, pointwise_relation.
+  intros D1 D2 H.
+  unfold neg_sem.
+  intros s.
+  rewrite H.
+  reflexivity.
+Qed.
+
+#[export] Instance abs_sem_congr:
+  Proper (func_equiv _ _ ==> func_equiv _ _) abs_sem.
+Proof.
+  unfold Proper, respectful,
+         func_equiv, pointwise_relation.
+  intros D1 D2 H.
+  unfold abs_sem.
+  intros s.
+  rewrite H.
+  reflexivity.
+Qed.
 
 (** 第五步，请你证明行为等价是等价关系，并且所有语法算子都能保持行为等价。在
     SimpleWhile语言中，我们证明了以下结论，供你参考。
@@ -238,4 +295,132 @@ Qed.
       [[ "x" - (- (- (- (- "y")))) ]] ~=~ [[ "x" - "y" ]]
       *)
 
+#[export] Instance iequiv_equiv: Equivalence iequiv.
+Proof.
+  unfold iequiv.
+  apply equiv_in_domain.
+  apply func_equiv_equiv.
+Qed.
 
+#[export] Instance EConst_congr:
+  Proper (eq ==> iequiv) EConst.
+Proof.
+  unfold Proper, respectful, iequiv.
+  intros n1 n2 Hn.
+  subst.
+  reflexivity.
+Qed.
+
+#[export] Instance EVar_congr:
+  Proper (eq ==> iequiv) EVar.
+Proof.
+  unfold Proper, respectful, iequiv.
+  intros x1 x2 Hx.
+  subst.
+  reflexivity.
+Qed.
+
+#[export] Instance EAdd_congr:
+  Proper (iequiv ==> iequiv ==> iequiv) EAdd.
+Proof.
+  unfold Proper, respectful, iequiv.
+  intros e1 e1' He e2 e2' He'.
+  simpl.
+  rewrite He, He'.
+  reflexivity.
+Qed.
+
+#[export] Instance ESub_congr:
+  Proper (iequiv ==> iequiv ==> iequiv) ESub.
+Proof.
+  unfold Proper, respectful, iequiv.
+  intros e1 e1' He e2 e2' He'.
+  simpl.
+  rewrite He, He'.
+  reflexivity.
+Qed.
+
+#[export] Instance EMul_congr:
+  Proper (iequiv ==> iequiv ==> iequiv) EMul.
+Proof.
+  unfold Proper, respectful, iequiv.
+  intros e1 e1' He e2 e2' He'.
+  simpl.
+  rewrite He, He'.
+  reflexivity.
+Qed.
+
+#[export] Instance ENeg_congr:
+  Proper (iequiv ==> iequiv) ENeg.
+Proof.
+  unfold Proper, respectful, iequiv.
+  intros e1 e2 He.
+  simpl.
+  rewrite He.
+  reflexivity.
+Qed.
+
+#[export] Instance EAbs_congr:
+  Proper (iequiv ==> iequiv) EAbs.
+Proof.
+  unfold Proper, respectful, iequiv.
+  intros e1 e2 He.
+  simpl.
+  rewrite He.
+  reflexivity.
+Qed.
+
+Lemma add_neg_equiv_sub:
+  forall e1 e2,
+    [[ e1 + (- e2) ]] ~=~ [[ e1 - e2 ]].
+Proof.
+  unfold iequiv.
+  intros e1 e2.
+  simpl.
+  unfold func_equiv, pointwise_relation.
+  intros s.
+  simpl.
+  unfold add_sem, neg_sem, sub_sem.
+  lia.
+Qed.
+
+Lemma sub_neg_equiv_add:
+  forall e1 e2,
+    [[ e1 - (- e2) ]] ~=~ [[ e1 + e2 ]].
+Proof.
+  unfold iequiv.
+  intros e1 e2.
+  simpl.
+  unfold func_equiv, pointwise_relation.
+  intros s.
+  simpl.
+  unfold sub_sem, neg_sem, add_sem.
+  lia.
+Qed.
+
+Lemma neg_neg_equiv:
+  forall e,
+    [[ - (- e) ]] ~=~ e.
+Proof.
+  unfold iequiv.
+  intros e.
+  simpl.
+  unfold func_equiv, pointwise_relation.
+  intros s.
+  simpl.
+  unfold neg_sem.
+  lia.
+Qed.
+
+Lemma nested_neg_example:
+  [[ "x" - (- (- (- (- "y")))) ]] ~=~ [[ "x" - "y" ]].
+Proof.
+    unfold iequiv.
+    intros.
+    simpl.
+    unfold sub_sem, var_sem.
+    intros s.
+    simpl.
+    unfold neg_sem.
+    lia.
+Qed.
