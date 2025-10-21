@@ -38,7 +38,7 @@ SETS_FILES=$(SETS_FILE_NAMES:%.v=$(SETS_DIR)/%.v)
 PL_FILE_NAMES = \
     Syntax.v SimpleProofsAndDefs.v HighOrder.v SimpleInductiveType.v \
 	AlgebraicStructure.v DenotationsOfExpr.v Rewrite.v \
-	SetsAndRels.v 
+	SetsAndRels.v DenotationsAsRels.v BuiltInNat.v
 
 PL_FILES=$(PL_FILE_NAMES:%.v=$(PL_DIR)/%.v)
 
