@@ -86,6 +86,8 @@ Proof.
         - (exists y, y = x + 1 /\ z = y + 1) <-> z = x + 2 *)
   split.
   + intros [y [? ?]].
+  (** [y [? ?]] 的意思是：存在一个y，使得x与y的关系在S1中成立，并且y与z的关系在S1中成立。
+        这里的_[?]_表示存在一个命题，但我们并不关心它具体是什么，因此用_[?]_代替。*)
     lia.
   + intros.
     exists (x + 1).
@@ -341,7 +343,15 @@ Qed.
 Fact sets_fact_ex: forall (A: Type) (X Y: A -> Prop),
   X ⊆ Y ->
   X ∩ Y == X.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    apply Sets_equiv_Sets_included; split.
+    + rewrite Sets_intersect_included1.
+      reflexivity.
+    + apply Sets_included_intersect.
+        - reflexivity.
+        - apply H.
+Qed.
 
 (************)
 (** 习题：  *)
@@ -352,7 +362,17 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 Example Sets1_intersect_absorb_union:
   forall {A: Type} (x y: A -> Prop),
     x ∩ (x ∪ y) == x.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+  intros.
+  apply Sets_equiv_Sets_included; split.
+  + rewrite Sets_intersect_included1.
+    reflexivity.
+  + Sets_unfold.
+    intros.
+    split.
+    - apply H.
+    - tauto.
+Qed.
 
 (************)
 (** 习题：  *)
@@ -363,7 +383,16 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 Example Sets1_union_absorb_intersect:
   forall {A: Type} (x y: A -> Prop),
     x ∪ (x ∩ y) == x.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+  intros.
+  apply Sets_equiv_Sets_included; split.
+  + Sets_unfold.
+    intros.
+    tauto.
+  + Sets_unfold.
+    intros.
+    tauto.
+Qed.
 
 
 (** 总而言之，以下这些SetsClass拓展库中的引理，构成了供我们手动证明集合运算性质的基本
@@ -441,8 +470,15 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 
 Lemma Sets1_intersect_empty_l:
   forall (A: Type) (x: A -> Prop), ∅ ∩ x == ∅.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
-
+Proof.
+  intros.
+  apply Sets_equiv_Sets_included; split.
+    + rewrite Sets_intersect_included1.
+      reflexivity.
+    + apply Sets_included_intersect.
+        reflexivity.
+        apply Sets_empty_included.
+Qed.
 
 (** SetsClass库中提供的关于补集的性质有下面四组。(1) 一个集合与自己的补集求交或求并会
     得到空集或全集。 
@@ -541,7 +577,19 @@ Lemma plus_n_plus_m:
   forall (plus_rel: Z -> Z -> Z -> Prop),
     (forall n m1 m2, (m1, m2) ∈ plus_rel n <-> m1 + n = m2) ->
     (forall n m, plus_rel n ∘ plus_rel m == plus_rel (n + m)).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    Sets_unfold.
+    intros x z.
+    rewrite H.
+    setoid_rewrite H.
+    split.
+    + intros [y [? ?]].
+        lia.
+    + intros.
+        exists (x + n).
+        lia.
+Qed.
 
 (************)
 (** 习题：  *)
@@ -552,16 +600,48 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 Lemma Rels22_concat_assoc:
   forall {A: Type} (x y z: A -> A -> Prop),
     (x ∘ y) ∘ z == x ∘ (y ∘ z).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+  intros.
+  Sets_unfold.
+  intros a d.
+  split.
+  - intros [b [[c [Hxc Hycb]] Hbd]].
+    exists c. split; [exact Hxc|].
+    exists b. split; assumption.
+  - intros [c [Hac [b [Hcb Hbd]]]].
+    exists b. split.
+    + exists c. split; assumption.
+    + exact Hbd.
+Qed.
 
 Lemma Rels22_concat_id_l:
   forall {A: Type} (x: A -> A -> Prop),
     Rels.id ∘ x == x.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+  intros.
+  Sets_unfold.
+  intros a b.
+  split.
+  - intros [c [Hac Hcb]].
+    subst c.
+    exact Hcb.
+  - intros Hxab.
+    exists a. split; [reflexivity | exact Hxab].
+Qed.
 
 Lemma Rels22_concat_union_distr_r:
   forall {A: Type} (x y z: A -> A -> Prop),
     (x ∪ y) ∘ z == x ∘ z ∪ y ∘ z.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
-
-
+Proof.
+  intros.
+  Sets_unfold.
+  intros a c.
+  split.
+  - intros [b [Hunion Hzb]].
+    destruct Hunion as [Hxb | Hyb].
+    + left. exists b. split; assumption.
+    + right. exists b. split; assumption.
+  - intros [[b [Hxb Hzb]] | [b [Hyb Hzb]]].
+    + exists b. split; [left; exact Hxb | exact Hzb].
+    + exists b. split; [right; exact Hyb | exact Hzb].
+Qed.

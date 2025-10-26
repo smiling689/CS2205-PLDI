@@ -84,6 +84,4 @@ Fact group_basic: forall (f: Z -> Z -> Z) (g: Z -> Z),
   (forall x, f 1 x = x) ->
   (forall x, f (g x) x = 1) ->
   (forall x, f x (g x) = 1).
-Proof.
-  intros.
-  unfold assoc in H.
+Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
