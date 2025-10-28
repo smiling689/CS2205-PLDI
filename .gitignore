@@ -22,3 +22,5 @@ CONFIGURE
 .vscode/
 # grader
 Grader/
+
+.github/
