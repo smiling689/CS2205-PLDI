@@ -336,7 +336,7 @@ Qed.
 (** 习题：  *)
 (************)
 
-(** 请证明下面关于集合的性质。 *)
+(** 请试着在不使用_[sets_unfold]_或_[Sets_unfold]_的情况下证明下面集合运算的性质。*)
 
 Fact sets_fact_ex: forall (A: Type) (X Y: A -> Prop),
   X ⊆ Y ->
@@ -347,7 +347,7 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 (** 习题：  *)
 (************)
 
-(** 请证明下面集合运算的性质。*)
+(** 请试着在不使用_[sets_unfold]_或_[Sets_unfold]_的情况下证明下面集合运算的性质。*)
 
 Example Sets1_intersect_absorb_union:
   forall {A: Type} (x y: A -> Prop),
@@ -358,7 +358,7 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 (** 习题：  *)
 (************)
 
-(** 请证明下面集合运算的性质。*)
+(** 请试着在不使用_[sets_unfold]_或_[Sets_unfold]_的情况下证明下面集合运算的性质。*)
 
 Example Sets1_union_absorb_intersect:
   forall {A: Type} (x y: A -> Prop),
@@ -407,6 +407,30 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
         Sets_union_intersect_distr_r:
           forall x y z, (x ∩ y) ∪ z == (x ∪ z) ∩ (y ∪ z)
       *)
+(************)
+(** 习题：  *)
+(************)
+
+(** 请试着在不使用_[sets_unfold]_或_[Sets_unfold]_的情况下证明下面集合运算的性质。*)
+
+Fact Sets_ex1:
+  forall {A: Type} (x y z: A -> Prop),
+    x ⊆ y ->
+    x ∪ z ⊆ z ∪ y.
+Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+
+(************)
+(** 习题：  *)
+(************)
+
+(** 请试着在不使用_[sets_unfold]_或_[Sets_unfold]_的情况下证明下面集合运算的性质。*)
+
+Fact Sets_ex2:
+  forall {A: Type} (x1 x2 y1 y2: A -> Prop),
+    (x1 ∩ x2) ∪ (y1 ∩ y2) ⊆
+    (x1 ∪ y1) ∩ (x2 ∪ y2).
+Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+
 
 (** ** 空集、补集、全集、无穷交与无穷并性质的Coq证明 *)
 
@@ -511,6 +535,29 @@ Proof.
   rewrite (Sets_indexed_intersect_included n).
   reflexivity.
 Qed.
+(************)
+(** 习题：  *)
+(************)
+
+(** 请试着在不使用_[sets_unfold]_或_[Sets_unfold]_的情况下证明下面集合运算的性质。*)
+
+Fact IndexUnion_ex1:
+  forall {A: Type} (xs: nat -> A -> Prop),
+    ⋃ (fun n => xs (2 * n)%nat) ⊆ ⋃ xs.
+Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+
+(************)
+(** 习题：  *)
+(************)
+
+(** 请试着在不使用_[sets_unfold]_或_[Sets_unfold]_的情况下证明下面集合运算的性质。*)
+
+Fact IndexUnion_ex2:
+  forall {A: Type} (xs: nat -> A -> Prop),
+    (forall n m, (n <= m)%nat -> xs n ⊆ xs m) ->
+    ⋃ (fun n => xs (2 * n)%nat) == ⋃ xs.
+Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+
 
 (** ** 二元关系运算性质的Coq证明 *)
 
@@ -531,37 +578,4 @@ Qed.
 
     另外，二元关系对并集的分配律对于无穷并集也成立。这些性质对应了SetsClass库中的下面
     这些定理。*)
-(************)
-(** 习题：  *)
-(************)
-
-(** 请根据二元关系连接的定义证明下面性质。*)
-
-Lemma plus_n_plus_m:
-  forall (plus_rel: Z -> Z -> Z -> Prop),
-    (forall n m1 m2, (m1, m2) ∈ plus_rel n <-> m1 + n = m2) ->
-    (forall n m, plus_rel n ∘ plus_rel m == plus_rel (n + m)).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
-
-(************)
-(** 习题：  *)
-(************)
-
-(** 请根据二元关系连接的定义证明下面性质。*)
-
-Lemma Rels22_concat_assoc:
-  forall {A: Type} (x y z: A -> A -> Prop),
-    (x ∘ y) ∘ z == x ∘ (y ∘ z).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
-
-Lemma Rels22_concat_id_l:
-  forall {A: Type} (x: A -> A -> Prop),
-    Rels.id ∘ x == x.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
-
-Lemma Rels22_concat_union_distr_r:
-  forall {A: Type} (x y z: A -> A -> Prop),
-    (x ∪ y) ∘ z == x ∘ z ∪ y ∘ z.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
-
 

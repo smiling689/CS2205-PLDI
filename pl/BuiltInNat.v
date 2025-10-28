@@ -1,5 +1,7 @@
 Require Import Coq.ZArith.ZArith.
 
+(** * 用归纳法证明自然数性质 *)
+
 (** 在Coq中，许多数学上的集合可以用归纳类型定义。例如，Coq中自然数的定义就是最简
     单的归纳类型之一。下面Coq代码可以用于查看_[nat]_在Coq中的定义。*)
 
@@ -216,8 +218,60 @@ Check Nat.mul_assoc.
 Check Nat.mul_1_l.
 Check Nat.mul_1_r.
 
-(** 自然数的带余除法在Coq中的定义比较复杂，这里只介绍其中最简单情况“除以二取整”的定义
-    （标准库中的_[Nat.div2]_）并证明几个基本性质。
+(** 前面已经提到，Coq在自然数集合上不便于表达减法等运算，因此，Coq用户有些时候可以选用
+    _[Z]_而非_[nat]_。然而，由于其便于表示计数概念以及表述数学归纳法，_[nat]_依然有许
+    多用途。例如，Coq标准库中的_[Nat.iter]_就表示函数多次迭代，具体而言，
+    _[Nat.iter n f]_表示将函数_[f]_迭代_[n]_次的结果。其Coq定义如下：
+
+   
+      Fixpoint iter {A: Type} (n: nat) (f: A -> A) (x: A): A :=
+        match n with
+        | O => x
+        | S n' => f (iter n' f x)
+        end. 
+      
+    它符合许多重要性质，例如：*)
+
+Theorem iter_S:
+  forall {A: Type} (n: nat) (f: A -> A) (x: A),
+    Nat.iter n f (f x) = Nat.iter (S n) f x.
+
+(** 注意，哪怕是如此简单的性质，我们还是需要在Coq中使用归纳法证明。*)
+
+Proof.
+  intros.
+  induction n; simpl.
+  + reflexivity.
+  + rewrite IHn; simpl.
+    reflexivity.
+Qed.
+
+(************)
+(** 习题：  *)
+(************)
+
+(** 请证明下面关于_[Nat.iter]_的性质。*)
+
+Theorem iter_add:
+  forall {A: Type} (n m: nat) (f: A -> A) (x: A),
+    Nat.iter (n + m) f x = Nat.iter n f (Nat.iter m f x).
+Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+
+(************)
+(** 习题：  *)
+(************)
+
+(** 请证明下面关于_[Nat.iter]_的性质。*)
+
+Theorem iter_mul:
+  forall {A: Type} (n m: nat) (f: A -> A) (x: A),
+    Nat.iter (n * m) f x = Nat.iter n (Nat.iter m f) x.
+Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+
+
+(** * 补充内容：Coq中的跨步归纳法 *)
+
+(** 如果要定义自然数中的“除以二取整”这个运算，则很自然可以在Coq中写出如下定义：
 
    
       Fixpoint div2 (n: nat): nat :=
@@ -230,20 +284,21 @@ Check Nat.mul_1_r.
         end.
       
 
-    上述定义的_[Nat.div2]_依然是一个Coq中的结构递归函数。与其他简单递归函数不同，该定
-    义并不是将_[Nat.div2 (S n)]_的定义规约为_[Nat.div2 n]_，而是将
-    _[Nat.div2 (S (S n))]_的定义跨两步规约为_[Nat.div2 n]_。Coq也是允许这样的结构递
-    归定义的。*)
+    该定义就是Coq标准库中的_[Nat.div2]_。可以看出，_[Nat.div2]_是一个结构递归函数，
+    不过，与其他简单递归函数不同，该定义并不是将_[Nat.div2 (S n)]_的定义规约为
+    _[Nat.div2 n]_，而是将_[Nat.div2 (S (S n))]_的定义跨两步规约为_[Nat.div2 n]_。
+    Coq也是允许这样的结构递归定义的。下面我们证明几条_[Nat.div2]_的基本性质。我们首先
+    证明_[Nat.div2]_的“跨两步递归等式”：_[div2_succ_succ]_。这一性质可以直接基于定义
+    用_[simpl]_指令证明。*)
 
 Lemma div2_succ_succ: forall n, Nat.div2 (S (S n)) = S (Nat.div2 n).
 Proof. intros. simpl. reflexivity. Qed.
 
-(** 下面列举几个_[Nat.div2]_的重要性质。首先，_[2*n]_除以二取整会得到_[n]_。*)
+(** 其次，_[2*n]_除以二取整会得到_[n]_。很自然，该性质可以通过对_[n]_归纳完成证明。*)
 
 Theorem div2_double: forall n, Nat.div2 (2 * n) = n.
 Proof.
   intros.
-  (** 用归纳法证明该性质是很自然的 *)
   induction n.
   + (** 奠基步骤需要我们证明_[Nat.div2 (2 * 0) = 0]_，这是显然的。*)
     simpl.
@@ -260,7 +315,7 @@ Proof.
     reflexivity.
 Qed.
 
-(** 其次，_[S (2 * n)]_除以二取整也会得到_[n]_本身，它的正面也是类似的。*)
+(** 类似的，_[S (2 * n)]_除以二取整也会得到_[n]_本身。*)
 
 Theorem div2_succ_double: forall n, Nat.div2 (S (2 * n)) = n.
 Proof.
@@ -382,55 +437,5 @@ Qed.
 
 Theorem double_div2':
   forall n, Nat.div2 n + Nat.div2 (S n) = n.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
-
-(** 前面已经提到，Coq在自然数集合上不便于表达减法等运算，因此，Coq用户有些时候可以选用
-    _[Z]_而非_[nat]_。然而，由于其便于表示计数概念以及表述数学归纳法，_[nat]_依然有许
-    多用途。例如，Coq标准库中的_[Nat.iter]_就表示函数多次迭代，具体而言，
-    _[Nat.iter n f]_表示将函数_[f]_迭代_[n]_次的结果。其Coq定义如下：
-
-   
-      Fixpoint iter {A: Type} (n: nat) (f: A -> A) (x: A): A :=
-        match n with
-        | O => x
-        | S n' => f (iter n' f x)
-        end. 
-      
-    它符合许多重要性质，例如：*)
-
-Theorem iter_S:
-  forall {A: Type} (n: nat) (f: A -> A) (x: A),
-    Nat.iter n f (f x) = Nat.iter (S n) f x.
-
-(** 注意，哪怕是如此简单的性质，我们还是需要在Coq中使用归纳法证明。*)
-
-Proof.
-  intros.
-  induction n; simpl.
-  + reflexivity.
-  + rewrite IHn; simpl.
-    reflexivity.
-Qed.
-
-(************)
-(** 习题：  *)
-(************)
-
-(** 请证明下面关于_[Nat.iter]_的性质。*)
-
-Theorem iter_add:
-  forall {A: Type} (n m: nat) (f: A -> A) (x: A),
-    Nat.iter (n + m) f x = Nat.iter n f (Nat.iter m f x).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
-
-(************)
-(** 习题：  *)
-(************)
-
-(** 请证明下面关于_[Nat.iter]_的性质。*)
-
-Theorem iter_mul:
-  forall {A: Type} (n m: nat) (f: A -> A) (x: A),
-    Nat.iter (n * m) f x = Nat.iter n (Nat.iter m f) x.
 Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
 
