@@ -338,7 +338,7 @@ Qed.
 (** 习题：  *)
 (************)
 
-(** 请证明下面关于集合的性质。 *)
+(** 请试着在不使用_[sets_unfold]_或_[Sets_unfold]_的情况下证明下面集合运算的性质。*)
 
 Fact sets_fact_ex: forall (A: Type) (X Y: A -> Prop),
   X ⊆ Y ->
@@ -357,7 +357,7 @@ Qed.
 (** 习题：  *)
 (************)
 
-(** 请证明下面集合运算的性质。*)
+(** 请试着在不使用_[sets_unfold]_或_[Sets_unfold]_的情况下证明下面集合运算的性质。*)
 
 Example Sets1_intersect_absorb_union:
   forall {A: Type} (x y: A -> Prop),
@@ -378,7 +378,7 @@ Qed.
 (** 习题：  *)
 (************)
 
-(** 请证明下面集合运算的性质。*)
+(** 请试着在不使用_[sets_unfold]_或_[Sets_unfold]_的情况下证明下面集合运算的性质。*)
 
 Example Sets1_union_absorb_intersect:
   forall {A: Type} (x y: A -> Prop),
@@ -436,6 +436,30 @@ Qed.
         Sets_union_intersect_distr_r:
           forall x y z, (x ∩ y) ∪ z == (x ∪ z) ∩ (y ∪ z)
       *)
+(************)
+(** 习题：  *)
+(************)
+
+(** 请试着在不使用_[sets_unfold]_或_[Sets_unfold]_的情况下证明下面集合运算的性质。*)
+
+Fact Sets_ex1:
+  forall {A: Type} (x y z: A -> Prop),
+    x ⊆ y ->
+    x ∪ z ⊆ z ∪ y.
+Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+
+(************)
+(** 习题：  *)
+(************)
+
+(** 请试着在不使用_[sets_unfold]_或_[Sets_unfold]_的情况下证明下面集合运算的性质。*)
+
+Fact Sets_ex2:
+  forall {A: Type} (x1 x2 y1 y2: A -> Prop),
+    (x1 ∩ x2) ∪ (y1 ∩ y2) ⊆
+    (x1 ∪ y1) ∩ (x2 ∪ y2).
+Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+
 
 (** ** 空集、补集、全集、无穷交与无穷并性质的Coq证明 *)
 
@@ -547,6 +571,29 @@ Proof.
   rewrite (Sets_indexed_intersect_included n).
   reflexivity.
 Qed.
+(************)
+(** 习题：  *)
+(************)
+
+(** 请试着在不使用_[sets_unfold]_或_[Sets_unfold]_的情况下证明下面集合运算的性质。*)
+
+Fact IndexUnion_ex1:
+  forall {A: Type} (xs: nat -> A -> Prop),
+    ⋃ (fun n => xs (2 * n)%nat) ⊆ ⋃ xs.
+Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+
+(************)
+(** 习题：  *)
+(************)
+
+(** 请试着在不使用_[sets_unfold]_或_[Sets_unfold]_的情况下证明下面集合运算的性质。*)
+
+Fact IndexUnion_ex2:
+  forall {A: Type} (xs: nat -> A -> Prop),
+    (forall n m, (n <= m)%nat -> xs n ⊆ xs m) ->
+    ⋃ (fun n => xs (2 * n)%nat) == ⋃ xs.
+Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+
 
 (** ** 二元关系运算性质的Coq证明 *)
 
