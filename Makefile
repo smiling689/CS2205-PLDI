@@ -48,6 +48,7 @@ ASSIGNMENT_FILE_NAMES = \
 	Assignment1014b.v \
 	Assignment1021b.v \
 	Assignment1028.v \
+	Assignment1030.v
 
 ASSIGNMENT_FILES=$(ASSIGNMENT_FILE_NAMES:%.v=$(ASSIGNMENT_DIR)/%.v)
 
