@@ -18,8 +18,12 @@ Local Open Scope list.
 Theorem rev_app_distr:
   forall A (l1 l2: list A),
     rev (l1 ++ l2) = rev l2 ++ rev l1.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
-
+Proof.
+    intros.
+    induction l1 as [| h t IH].
+    - simpl. rewrite app_nil_r. reflexivity.
+    - simpl. rewrite IH. rewrite app_assoc. reflexivity.
+Qed.
 
 (************)
 (** 习题：  *)
@@ -27,7 +31,12 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 
 Theorem rev_involutive:
   forall A (l: list A), rev (rev l) = l.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    induction l as [| h t IH].
+    - simpl. reflexivity.
+    - simpl. rewrite rev_app_distr. simpl. rewrite IH. reflexivity.
+Qed.
 
 
 
@@ -68,6 +77,7 @@ Definition union_sem {A: Type} (D1 D2: list A -> Prop): list A -> Prop :=
 Definition app_sem {A: Type} (D1 D2: list A -> Prop): list A -> Prop :=
   fun l => exists l1 l2, l1 ∈ D1 /\ l2 ∈ D2 /\ l = l1 ++ l2.
 
+(** NOTE power的语义是递归定义的，表示的是对于任意自然数n，D的n次幂的语义。*)
 Fixpoint power_sem {A: Type} (D: list A -> Prop) (n: nat): list A -> Prop :=
   match n with
   | O => empty_str_sem
@@ -101,44 +111,114 @@ Notation "r1 '~=~' r2" := (requiv r1 r2)
 
 #[export] Instance requiv_equiv: forall {A: Type},
   Equivalence (@requiv A).
-Proof.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
-
+Proof. 
+    intros A. 
+    unfold requiv. 
+    apply equiv_in_domain. 
+    apply Sets_equiv_equiv. 
+Qed.
+    
+    
 Theorem RE_Union_comm: forall {A: Type} (r1 r2: reg_exp A),
   RE_Union r1 r2 ~=~ RE_Union r2 r1.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    unfold requiv.
+    simpl.
+    unfold union_sem.
+    Sets_unfold.
+    tauto.
+Qed.
 
 Lemma app_sem_id_l: forall {A: Type} (D: list A -> Prop),
   app_sem empty_str_sem D == D.
 Proof.
-  intros.
-  unfold app_sem, empty_str_sem; Sets_unfold.
-  intros l.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+    intros.
+    unfold app_sem, empty_str_sem; Sets_unfold.
+    intros l.
+    split; intros H.
+    - destruct H as [l1 [l2 [H1 [H2 H3] ] ] ].
+      rewrite H1 in H3.
+      rewrite app_nil_l in H3.
+      rewrite H3.
+        assumption.
+    - exists nil, l.
+      split.
+      + simpl. reflexivity.
+      + split.
+        * assumption.
+        * simpl. reflexivity.
+Qed.
+
 
 Theorem RE_App_id_l: forall {A: Type} (r: reg_exp A),
   RE_App RE_EmptyStr r ~=~ r.
 Proof.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+    intros.
+    unfold requiv.
+    simpl.
+    rewrite app_sem_id_l.
+    reflexivity.
+Qed.
+
+(**NOTE 附加题 *)
 
 Lemma app_sem_assoc1: forall {A: Type} (D1 D2 D3: list A -> Prop),
   app_sem D1 (app_sem D2 D3) ⊆ app_sem (app_sem D1 D2) D3.
 Proof.
-  intros.
-  unfold app_sem; Sets_unfold.
-  intros l H.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+    intros.
+    unfold app_sem; Sets_unfold.
+    intros l H.
+    destruct H as [l1 [l23 [H1 [H2 H3] ] ] ].
+    destruct H2 as [l2 [l3 [H21 [H22 H23] ] ] ].
+    exists (l1 ++ l2), l3.
+    split.
+    - exists l1, l2.
+      split.
+        + assumption.
+        + split.
+          * assumption.
+          * reflexivity.
+    - split.
+      + assumption.
+      + rewrite H3.
+      rewrite H23.
+       rewrite app_assoc. reflexivity.
+Qed.
+
 
 Lemma app_sem_assoc2: forall {A: Type} (D1 D2 D3: list A -> Prop),
   app_sem (app_sem D1 D2) D3 ⊆ app_sem D1 (app_sem D2 D3).
 Proof.
-  intros.
-  unfold app_sem; Sets_unfold.
-  intros l H.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+    intros.
+    unfold app_sem; Sets_unfold.
+    intros l H.
+    destruct H as [l12 [l3 [H12 [H3 H] ] ] ].
+    destruct H12 as [l1 [l2 [H1 [H2 H12] ] ] ].
+    exists l1, (l2 ++ l3).
+    split.
+    - assumption.
+    - split.
+      + exists l2, l3.
+        split.
+        * assumption.
+        * split.
+          -- assumption.
+          -- reflexivity.
+        + rewrite H.
+            rewrite H12.
+            rewrite app_assoc. reflexivity.
+Qed.    
+
+  
 
 Theorem RE_App_assoc: forall {A: Type} (r1 r2 r3: reg_exp A),
   RE_App r1 (RE_App r2 r3) ~=~ RE_App (RE_App r1 r2) r3.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    unfold requiv.
+    simpl.
+    split; apply app_sem_assoc1 || apply app_sem_assoc2.
+Qed.
 
 
