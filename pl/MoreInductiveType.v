@@ -29,6 +29,8 @@ Local Open Scope list.
 
     第一个例子是证明_[tree_size]_与_[tree_reverse]_之间的关系。*)
 
+(** tree_reverse 的意思是反转二叉树 *)
+
 Lemma reverse_size: forall t,
   tree_size (tree_reverse t) = tree_size t.
 Proof.
@@ -86,7 +88,16 @@ Qed.
 
 Lemma reverse_involutive: forall t,
   tree_reverse (tree_reverse t) = t.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    induction t.
+    simpl.
+    + reflexivity.
+    + simpl.
+    rewrite IHt1.
+    rewrite IHt2.
+    reflexivity.
+Qed.
 
 (************)
 (** 习题：  *)
@@ -94,7 +105,14 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 
 Lemma size_nonneg: forall t,
   0 <= tree_size t.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    induction t.
+    simpl.
+    + reflexivity.
+    + simpl.
+    lia.
+Qed.
 
 (************)
 (** 习题：  *)
@@ -103,7 +121,16 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 Lemma reverse_result_Node: forall t t1 k t2,
   tree_reverse t = Node t1 k t2 ->
   t = Node (tree_reverse t2) k (tree_reverse t1).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    induction t.
+    + simpl in H.
+      discriminate H.
+    + simpl in H.
+      inversion H; subst.
+      repeat rewrite reverse_involutive.
+      reflexivity.
+Qed.
 
 (** * 加强归纳 *)
 

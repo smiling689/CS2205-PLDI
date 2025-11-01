@@ -72,11 +72,28 @@ Qed.
 
 Theorem and_assoc1: forall P Q R: Prop,
   P /\ (Q /\ R) -> (P /\ Q) /\ R.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    destruct H as [A [B C] ].
+    split.
+    split.
+    apply A.
+    apply B.
+    apply C.
+Qed.
+
 
 Theorem and_assoc2: forall P Q R: Prop,
   (P /\ Q) /\ R -> P /\ (Q /\ R).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    destruct H as [[A B] C].
+    split.
+    apply A.
+    split.
+    apply B.
+    apply C.
+Qed.
 
 (** * 关于“或”的证明 *)
 
@@ -135,7 +152,12 @@ Qed.
 
 Theorem or_comm: forall P Q: Prop,
   P \/ Q  -> Q \/ P.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    destruct H as [HP | HQ].
+    - right. apply HP.
+    - left. apply HQ.
+Qed.
 
 (************)
 (** 习题：  *)
@@ -145,11 +167,23 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 
 Theorem or_assoc1: forall P Q R: Prop,
   P \/ (Q \/ R)  -> (P \/ Q) \/ R.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    destruct H as [HP | [HQ | HR]].
+    - left. left. apply HP.
+    - left. right. apply HQ.
+    - right. apply HR.
+Qed.
 
 Theorem or_assoc2: forall P Q R: Prop,
   (P \/ Q) \/ R -> P \/ (Q \/ R).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    destruct H as [[HP | HQ] | HR].
+    - left. apply HP.
+    - right. left. apply HQ.
+    - right. right. apply HR.
+Qed.
 
 (** * 关于“当且仅当”的证明 *)
 
@@ -210,7 +244,17 @@ Qed.
 (** 请在不使用_[tauto]_指令的情况下证明下面结论。*)
 
 Theorem or_dup: forall P: Prop, P \/ P <-> P.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    split.
+    - intros.
+        destruct H.
+        + apply H.
+        + apply H.
+    - intros.
+        left.
+        apply H.
+Qed.
 
 (** * 命题逻辑综合应用 *)
 
@@ -227,7 +271,12 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 
 Theorem modus_ponens: forall P Q: Prop,
   P /\ (P -> Q) -> Q.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    destruct H as [HP H0].
+    apply H0.
+    apply HP.
+Qed.
 
 (************)
 (** 习题：  *)
@@ -237,7 +286,30 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 
 Theorem and_or_distr_l: forall P Q R: Prop,
   P /\ (Q \/ R) <-> P /\ Q \/ P /\ R.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    split.
+    - intros.
+        destruct H as [HP [HQ | HR] ].
+        + left.
+            split.
+            * apply HP.
+            * apply HQ.
+        + right.
+            split.
+            * apply HP.
+            * apply HR.
+    - intros.
+        destruct H as [ [HP HQ] | [HP HR] ].
+        + split.
+            * apply HP.
+            * left.
+                apply HQ.
+        + split.
+            * apply HP.
+            * right.
+                apply HR.
+Qed.
 
 (************)
 (** 习题：  *)
@@ -247,7 +319,34 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 
 Theorem or_and_distr_l: forall P Q R: Prop,
   P \/ (Q /\ R) <-> (P \/ Q) /\ (P \/ R).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    split.
+    - intros.
+        destruct H as [HP | [HQ HR] ].
+        + split.
+            * left.
+                apply HP.
+            * left.
+                apply HP.
+        + split.
+            * right.
+                apply HQ.
+            * right.
+                apply HR.
+    - intros.
+        destruct H as [ [HP | HQ]  [HP' | HR] ].
+        + left.
+            apply HP.
+        + left.
+            apply HP.
+        + left.
+            apply HP'.
+        + right.
+            split.
+            * apply HQ.
+            * apply HR.
+Qed.
 
 (************)
 (** 习题：  *)
@@ -257,7 +356,19 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 
 Theorem and_or_absorb: forall P Q: Prop,
   P /\ (P \/ Q) <-> P.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    split.
+    - intros.
+        destruct H as [HP [HQ | HR] ].
+        + apply HP.
+        + apply HP.
+    - intros.
+        split.
+        + apply H.
+        + left.
+        apply H.
+Qed.
 
 (************)
 (** 习题：  *)
@@ -267,7 +378,17 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 
 Theorem or_and_absorb: forall P Q: Prop,
   P \/ (P /\ Q) <-> P.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    split.
+    - intros.
+        destruct H as [HP | [HQ HR] ].
+        + apply HP.
+        + apply HQ.
+    - intros.
+        left.
+        apply H.
+Qed.
 
 (************)
 (** 习题：  *)
@@ -279,7 +400,28 @@ Theorem and_congr: forall P1 Q1 P2 Q2: Prop,
   (P1 <-> P2) ->
   (Q1 <-> Q2) ->
   (P1 /\ Q1 <-> P2 /\ Q2).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    split.
+    - intros.
+        destruct H as [HP HQ].
+        split.
+        + apply HP.
+        destruct H1.
+        apply H.
+        + apply H0.
+        destruct H1.
+        apply H1.
+    - intros.
+        destruct H as [HP HQ].
+        split.
+        + apply HQ.
+        destruct H1.
+        apply H.
+        + apply H0.
+        destruct H1.
+        apply H1.
+Qed.
 
 (************)
 (** 习题：  *)
@@ -291,7 +433,27 @@ Theorem or_congr: forall P1 Q1 P2 Q2: Prop,
   (P1 <-> P2) ->
   (Q1 <-> Q2) ->
   (P1 \/ Q1 <-> P2 \/ Q2).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    split.
+    - intros.
+        destruct H1 as [HP | HQ].
+        + left.
+            apply H.
+            apply HP.
+        + right.
+            apply H0.
+            apply HQ.
+    - intros.
+        destruct H1 as [HP | HQ].
+        + left.
+            apply H.
+            apply HP.
+        + right.
+            apply H0.
+            apply HQ.
+Qed.
+
 
 (************)
 (** 习题：  *)
@@ -303,7 +465,23 @@ Theorem imply_congr: forall P1 Q1 P2 Q2: Prop,
   (P1 <-> P2) ->
   (Q1 <-> Q2) ->
   ((P1 -> Q1) <-> (P2 -> Q2)).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    split.
+    - intros.
+        intros.
+        apply H0.
+        apply H1.
+        apply H.
+        apply H2.
+    - intros.
+        intros.
+        apply H0.
+        apply H1.
+        apply H.
+        apply H2.
+Qed.
+
 
 (************)
 (** 习题：  *)
@@ -314,7 +492,21 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 
 Theorem and_imply: forall P Q R: Prop,
   (P /\ Q -> R) <-> (P -> Q -> R).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    split.
+    - intros.
+        apply H.
+        split.
+        + apply H0.
+        + apply H1.
+    - intros.
+        apply H.
+        destruct H0.
+        + apply H0.
+        + destruct H0.
+        apply H1.
+Qed.
 
 (************)
 (** 习题：  *)
@@ -325,7 +517,27 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 
 Theorem or_imply: forall P Q R: Prop,
   (P \/ Q -> R) <-> (P -> R) /\ (Q -> R).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    split.
+    - intros.
+        split.
+        + intros.
+            apply H.
+            left.
+            apply H0.
+        + intros.
+            apply H.
+            right.
+            apply H0.
+    - intros.
+        destruct H as [HP HQ].
+        destruct H0 as [HP' | HQ'].
+        + apply HP.
+          apply HP'.
+        + apply HQ.
+            apply HQ'.
+Qed.
 
 (** 本章之后的内容中将介绍关于“任意”、“存在”与“非”的证明方式，在相关逻辑命题的证明过程
     中，涉及命题逻辑的部分将会灵活使用上面介绍的各种证明方式，包括_[tauto]_指令。习题
@@ -345,7 +557,13 @@ Proof. exists 2. lia. Qed.
 (************)
 
 Lemma six_is_not_prime: exists n, 2 <= n < 6 /\ exists q, n * q = 6.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    exists 3.
+    split.
+    - lia.
+    - exists 2.
+        lia.
+Qed.
 
 (** 当某前提形为：“存在一个_[x]_使得...”，那么可以使用Coq中的_[destruct]_指令进行
     证明。这一证明指令相当于数学证明中的：任意给定一个这样的_[x]_。 *)
@@ -380,8 +598,15 @@ Qed.
 
 Theorem exists_exists: forall (X Y: Type) (P: X -> Y -> Prop),
   (exists x y, P x y) <-> (exists y x, P x y).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
-
+Proof.
+  split.
+  - intros [x [y HP]].
+    exists y, x.
+    apply HP.
+  - intros [y [x HP]].
+    exists x, y.
+    apply HP.
+Qed.
 
 (** * 关于“任意”的证明 *)
 
@@ -503,7 +728,11 @@ Qed.
 
 Theorem forall_forall : forall (X Y: Type) (P: X -> Y -> Prop),
   (forall x y, P x y) -> (forall y x, P x y).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros.
+    specialize (H x y).
+    apply H.
+Qed.
 
 (************)
 (** 习题：  *)
@@ -514,7 +743,24 @@ Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结
 Theorem forall_iff : forall (X: Type) (P Q: X -> Prop),
   (forall x: X, P x <-> Q x) ->
   ((forall x: X, P x) <-> (forall x: X, Q x)).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+  intros.
+  split.
+  + intros H0.
+    intros x.
+    specialize (H x).
+    destruct H as [HP HQ].
+    apply HP.
+    specialize (H0 x).
+    apply H0.
+  + intros H0.
+    intros x.
+    specialize (H x).
+    destruct H as [HP HQ].
+    apply HQ.
+    specialize (H0 x).
+    apply H0.
+Qed.
 
 
 (** * 关于“非”的证明 *)
