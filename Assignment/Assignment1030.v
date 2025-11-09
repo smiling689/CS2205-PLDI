@@ -210,7 +210,7 @@ Proof.
             rewrite app_assoc. reflexivity.
 Qed.    
 
-  
+
 
 Theorem RE_App_assoc: forall {A: Type} (r1 r2 r3: reg_exp A),
   RE_App r1 (RE_App r2 r3) ~=~ RE_App (RE_App r1 r2) r3.
