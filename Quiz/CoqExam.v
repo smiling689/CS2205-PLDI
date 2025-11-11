@@ -51,12 +51,26 @@ Definition rotate {A: Type} (l1 l2: list A): Prop :=
 (** 首先，请证明_[rotate]_具有自反性：*)
 
 #[export] Instance rotate_refl {A: Type}: Reflexive (@rotate A).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros l.
+    unfold rotate.
+    exists (nil), l.
+    split.
+    + apply app_nil_l.
+    + rewrite app_nil_r.
+      reflexivity.
+Qed.
 
 (** 其次，请证明_[rotate]_具有对称性。*)
 
 #[export] Instance rotate_symm {A: Type}: Symmetric (@rotate A).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+    intros l1 l2 H.
+    unfold rotate in *.
+    destruct H as [lx [ly [H1 H2]]].
+    exists ly, lx.
+    split; assumption.
+Qed.
 
 (** 要证明_[rotate]_具有传递性要复杂一些。根据定义，
 
@@ -95,12 +109,57 @@ Lemma app_split3: forall {A: Type} (lx ly lu lv: list A),
   ly ++ lx = lu ++ lv ->
   (exists l, ly = lu ++ l /\ lv = l ++ lx) \/
   (exists l, lu = ly ++ l /\ lx = l ++ lv).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+  intros A lx ly lu lv.
+  revert lu lv.
+  induction ly as [|y ly IH]; intros lu lv H.
+  - simpl in H.
+    right.
+    exists lu.
+    split.
+    + now rewrite app_nil_l.
+    + exact H.
+  - simpl in H.
+    destruct lu as [|u lu'].
+    + left.
+      exists (y :: ly).
+      split.
+      * now rewrite app_nil_l.
+      * change ((y :: ly) ++ lx) with (y :: (ly ++ lx)).
+        symmetry in H.
+        exact H.
+    + simpl in H.
+      inversion H as [Hy].
+      subst u.
+    Admitted.
+
+      
+
+
 
 (** 接下去，请用上面的引理_[app_split3]_证明_[rotate]_有传递性。*)
 
 #[export] Instance rotate_trans {A: Type}: Transitive (@rotate A).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+  intros.
+  unfold Transitive, rotate.
+  intros.
+    destruct H as [ly [lx [H1 H2]]].
+    destruct H0 as [lu [lv [H3 H4]]].
+    rewrite H2 in H3.
+    assert  (x = ly ++ lx /\ z = lx ++ ly).
+    {
+        assert   ((exists l, ly = lu ++ l /\ lv = l ++ lx) \/
+  (exists l, lu = ly ++ l /\ lx = l ++ lv) ).
+        {
+            apply app_split3.
+        }
+        destruct H as [H5 |  H6].
+        exists .
+
+    }
+    
+Admitted.
 
 (** 现在我们已经证明了_[rotate]_是一个等价关系，因此就可以在Coq中写如下证明了。*)
 
@@ -133,11 +192,24 @@ Fixpoint power_rel {A: Type} (R: A -> A -> Prop) (n: nat): A -> A -> Prop :=
 
 Lemma power_rel_add: forall {A: Type} (R: A -> A -> Prop) (n m: nat),
   power_rel R n ∘ power_rel R m == power_rel R (n + m)%nat.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+  intros A R n.
+  induction n as [|n IH]; intros m; simpl.
+  -     rewrite Rels_concat_id_l.
+    reflexivity.
+  - specialize (IH m).
+    rewrite Rels_concat_assoc.
+    rewrite IH.
+    reflexivity.
+Qed. 
+
 
 Theorem power_rel_trans: forall {A: Type} (R: A -> A -> Prop),
   ⋃ (power_rel R) ∘ ⋃ (power_rel R) == ⋃ (power_rel R).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+  intros A R.
+Admitted.
+    
 
 
 Import Lang_SimpleWhile
@@ -158,7 +230,34 @@ Theorem Rels_test_concat_comm:
     Rels.test D1 ∘ Rels.test D2 ==
     Rels.test D2 ∘ Rels.test D1.
 Proof.
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+  intros D1 D2.
+  Sets_unfold.
+  intros s t.
+  split.
+  intros [u H].
+  destruct H as [H1 H2].
+  - sets_unfold in H1.
+    sets_unfold in H2.
+    destruct H1 as [HD1 Hsu].
+    destruct H2 as [HD2 Hut].
+    subst u t.
+    exists s.
+    split; sets_unfold; auto.
+  - intros [u H].
+  destruct H as [H1 H2].
+  sets_unfold in H1.
+  sets_unfold in H2.
+  destruct H1 as [HD2 Hsu].
+    destruct H2 as [HD1 Hut].
+    subst u.
+    exists t.
+    split.
+    + sets_unfold. split; assumption.
+    + sets_unfold. split.
+      * rewrite Hut in HD2. exact HD2.
+      * reflexivity.
+Qed. 
+
 
 (** 请证明下面关于行为等价的性质，证明中可以用到上面的结论。*)
 
@@ -170,6 +269,14 @@ Theorem if_if:
     [[ if (e2)
        then { if (e1) then {c1} else {c3} }
        else { if (e1) then {c2} else {c4} } ]].
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
-
+Proof.
+  unfold cequiv.
+  intros.
+  simpl.
+  repeat match goal with
+  | |- context[if_sem _ _ _] => unfold if_sem
+  end.
+  repeat rewrite Rels_concat_union_distr_l.
+  repeat rewrite Rels_concat_assoc.
+  
 
