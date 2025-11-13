@@ -176,6 +176,8 @@ End SetMonadExamples1.
 
 (** ** 集合单子的简单例子 *)
 
+Module SetMonadExamples2.
+
 Definition choice {A: Type} (f g: SetMonad.M A):
   SetMonad.M A :=
   f ∪ g.
