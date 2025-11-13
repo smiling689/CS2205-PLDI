@@ -12,7 +12,7 @@ COQBIN=
 COQC=$(COQBIN)coqc$(SUF)
 COQDEP=$(COQBIN)coqdep$(SUF)
 
-PL_FLAG = -R $(PL_DIR) PL  -R $(SETS_DIR) SetsClass
+PL_FLAG = -R $(PL_DIR) PL  -R $(SETS_DIR) SetsClass -R $(COMPCERT_DIR) compcert.lib
 SETS_FLAG = -R $(SETS_DIR) SetsClass
 COMPCERT_FLAG = -R $(COMPCERT_DIR) compcert.lib
 
