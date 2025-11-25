@@ -277,9 +277,21 @@ Record M (A: Type): Type := {
 
 Module Notations.
 
-Notation "x '.(nrm)'" := (nrm _ x) (at level 1).
+Notation "x '.(nrm)'" := (nrm _ x)
+  (at level 1, only printing).
 
-Notation "x '.(err)'" := (err _ x) (at level 1).
+Notation "x '.(err)'" := (err _ x)
+  (at level 1, only printing).
+
+Ltac any_nrm x := exact (nrm _ x).
+
+Ltac any_err x := exact (err _ x).
+
+Notation "x '.(nrm)'" := (ltac:(any_nrm x))
+  (at level 1, only parsing).
+
+Notation "x '.(err)'" := (ltac:(any_err x))
+  (at level 1, only parsing).
 
 End Notations.
 
