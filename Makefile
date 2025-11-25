@@ -58,7 +58,7 @@ ASSIGNMENT_FILES=$(ASSIGNMENT_FILE_NAMES:%.v=$(ASSIGNMENT_DIR)/%.v)
 QUIZ_FILE_NAMES = \
 	Quiz0930.v \
 	Quiz1016.v \
-	CoqExam.v
+# 	CoqExam.v
 
 QUIZ_FILES=$(QUIZ_FILE_NAMES:%.v=$(QUIZ_DIR)/%.v)
 
