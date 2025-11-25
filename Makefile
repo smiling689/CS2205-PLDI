@@ -42,7 +42,8 @@ PL_FILE_NAMES = \
 	AlgebraicStructure.v DenotationsOfExpr.v Rewrite.v \
 	SetsAndRels.v DenotationsAsRels.v BuiltInNat.v \
 	MoreInductiveType.v Logic.v \
-	monad.v
+	Monad.v \
+	WhileDExprDenotation.v Kleene.v
 
 PL_FILES=$(PL_FILE_NAMES:%.v=$(PL_DIR)/%.v)
 

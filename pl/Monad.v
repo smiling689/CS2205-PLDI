@@ -287,7 +287,7 @@ Import Notations.
 
 Definition ret (A: Type) (a: A): M A := {|
   nrm := Sets.singleton a;
-  err := ∅;
+  err := False;
 |}.
 
 Definition bind (A B: Type) (f: M A) (g: A -> M B):
