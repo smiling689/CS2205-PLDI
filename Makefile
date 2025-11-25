@@ -43,7 +43,7 @@ PL_FILE_NAMES = \
 	SetsAndRels.v DenotationsAsRels.v BuiltInNat.v \
 	MoreInductiveType.v Logic.v \
 	Monad.v \
-	WhileDExprDenotation.v Kleene.v
+	WhileDExprDenotation.v Kleene.v FixedPoint.v
 
 PL_FILES=$(PL_FILE_NAMES:%.v=$(PL_DIR)/%.v)
 
