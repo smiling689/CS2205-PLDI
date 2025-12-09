@@ -577,4 +577,57 @@ Proof.
     tauto.
 Qed.
 
+Arguments bind: simpl never.
+Arguments ret: simpl never.
+
+Fixpoint list_iter
+           {A B: Type}
+           (f: A -> B -> SetMonad.M B)
+           (l: list A)
+           (b: B):
+  SetMonad.M B :=
+  match l with
+  | nil => ret b
+  | a :: l0 => b0 <- f a b;; list_iter f l0 b0
+  end.
+
+Lemma Hoare_list_iter_aux {A B: Type}:
+  forall (f: A -> B -> SetMonad.M B)
+         (P: list A -> B -> Prop),
+    (forall b l a,
+       P l b ->
+       Hoare (f a b) (fun b0 => P (l ++ a :: nil) b0)) ->
+    (forall l2 b l1,
+       P l1 b ->
+       Hoare (list_iter f l2 b) (fun b0 => P (l1 ++ l2) b0)).
+Proof.
+  intros f P H l2.
+  induction l2; intros; simpl.
+  + apply Hoare_ret.
+    rewrite app_nil_r.
+    tauto.
+  + apply (Hoare_bind _ _ (fun b0 : B => P (l1 ++ [a]) b0)).
+    - apply H.
+      apply H0.
+    - intros b0 H1.
+      pose proof IHl2 b0 (l1 ++ [a]) H1.
+      rewrite <- app_assoc in H2.
+      simpl in H2.
+      apply H2.
+Qed.
+
+Theorem Hoare_list_iter {A B: Type}:
+  forall (f: A -> B -> SetMonad.M B)
+         (P: list A -> B -> Prop),
+    (forall b l a,
+       P l b ->
+       Hoare (f a b) (fun b0 => P (l ++ a :: nil) b0)) ->
+    (forall b l, P nil b -> Hoare (list_iter f l b) (fun b0 => P l b0)).
+Proof.
+  intros.
+  pose proof Hoare_list_iter_aux f P H l b nil.
+  tauto.
+Qed.
+
+
 End SetMonadHoare.

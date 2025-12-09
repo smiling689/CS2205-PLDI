@@ -81,9 +81,9 @@ Proof.
     rewrite Hoare_d1_step1. 
     split; unfold_d1; unfold_monad; intros. 
     - sets_unfold in H. 
-    destruct H as [x0 [H_d1 H_match]].
-    destruct H_d1 as [H_continue | H_break].
-    + destruct H_continue as [_ [H_ge H_val]].
+      destruct H as [x0 [H_d1 H_match]].
+      destruct H_d1 as [H_continue | H_break].
+      + destruct H_continue as [_ [H_ge H_val]].
       subst x0.
       destruct (Z.eqb_spec (a - 1) 0). 
       * assert (a = 1) by lia; subst. 
