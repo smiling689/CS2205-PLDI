@@ -43,23 +43,30 @@ Theorem functional_correctness_count:
   forall n,
     0 < n ->
     Hoare (count n) (fun x => x = n).
-Proof. 
-  intros. 
-  unfold count. 
-  apply (Hoare_repeat_break _ (fun x => x <= n)). 
-  - intros. 
-    unfold body_count. 
-    apply Hoare_choice. 
-    * apply Hoare_assume_bind. 
-      intros. 
-      apply Hoare_ret.
-      lia. 
-    * apply Hoare_assume_bind. 
-      intros. 
-      apply Hoare_ret.
-      lia. 
-  - lia.
+Proof.
+  intros.
+   unfold count.
+  apply (Hoare_repeat_break _ (fun x => x <= n)).
+  2: {
+    lia.
+  }
+  intros.
+   unfold body_count.
+  repeat apply Hoare_choice.
+  2: {
+    apply Hoare_assume_bind.
+    intros.
+    assert (a = n).
+    + lia.
+    + apply Hoare_ret.
+     apply H2.
+  }
+    apply Hoare_assume_bind.
+    intros.
+     apply Hoare_ret.
+    lia.
 Qed.
+
 
 
 (************)
@@ -84,25 +91,21 @@ Theorem functional_correctness_slow_div:
     0 <= m ->
     Hoare (slow_div n m)
           (fun '(x, y) => x + n * y = m /\ 0 <= x < n).
-Proof. 
-  intros. 
-  unfold slow_div. 
-  apply (Hoare_repeat_break _ (fun '(x, y) => x + n * y = m /\ 0 <= x)). 
-  - intros. 
-    unfold body_slow_div. 
-    destruct a as [x y].
-    destruct H1. 
-    apply Hoare_choice. 
-    * apply Hoare_assume_bind. 
-      intros. 
-      apply Hoare_ret. 
-      split; lia.
-    * apply Hoare_assume_bind. 
-      intros. 
-      apply Hoare_ret. 
-      split; lia.
-  - split; lia.
-Qed.
+Proof.
+    intros.
+    unfold slow_div.
+    apply (Hoare_repeat_break _ (fun '(x, y) => x + n * y = m /\ 0 <= x ));[|lia].
+    intros [x y]; intros.
+    unfold body_slow_div.
+    apply Hoare_choice.
+    + apply Hoare_assume_bind.
+      intros.
+       apply Hoare_ret.
+     lia.
+    + apply Hoare_assume_bind.
+      intros.
+       apply Hoare_ret.
+      lia.
+Qed. 
 
-(* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
 
