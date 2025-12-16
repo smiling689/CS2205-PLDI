@@ -48,7 +48,71 @@ Theorem insertion_perm:
     Hoare
       (insertion x l)
       (fun l0 => Permutation (l ++ [x]) l0).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof. 
+  intros.
+  unfold insertion.
+  apply (Hoare_repeat_break _ (fun '(l1, l2) => l = l1 ++ l2)). 
+  - intros. 
+    unfold insertion_body. 
+    destruct a.
+    destruct l1. 
+    + apply Hoare_ret.
+      rewrite H. 
+      rewrite <- app_assoc.
+      reflexivity.
+    + apply Hoare_choice. 
+      * apply Hoare_assume_bind. 
+        intros. 
+        apply Hoare_ret. 
+        rewrite H.
+        rewrite <- !app_assoc.
+        apply Permutation_app.
+        reflexivity.
+        apply Permutation_app_comm.
+      * apply Hoare_assume_bind. 
+        intros. 
+        apply Hoare_ret.
+        subst. 
+        rewrite <- app_assoc. 
+        reflexivity. 
+  - reflexivity.
+Qed.
+
+Lemma snoc_destruct: forall {A: Type} (l: list A),
+  l = nil \/
+  exists a l', l = l' ++ [a].
+Proof.
+  intros.
+  revert l; apply rev_ind.
+  + left; reflexivity.
+  + intros.
+    right.
+    eauto.
+Qed.
+
+Lemma incr_app_inv1: forall l1 l2,
+  incr (l1 ++ l2) ->
+  incr l1.
+Proof.
+  intros.
+  destruct (snoc_destruct l1).
+  + subst; simpl; tauto.
+  + destruct H0 as [? [? ?]]; subst.
+    rewrite <-app_assoc in H. 
+    apply incr_app_cons_inv1 in H.
+    tauto.
+Qed.
+
+Lemma incr_app_inv2: forall l1 l2,
+  incr (l1 ++ l2) ->
+  incr l2.
+Proof.
+  intros.
+  destruct l2.
+  + subst; simpl; tauto.
+  + apply incr_app_cons_inv2 in H.
+    tauto.
+Qed.
 
 Theorem insertion_incr:
   forall x l,
@@ -56,7 +120,45 @@ Theorem insertion_incr:
     Hoare
       (insertion x l)
       (fun l0 => incr l0).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+  intros.
+  unfold insertion.
+  apply (Hoare_repeat_break _ (fun '(l1, l2) => incr (l1 ++ [x]) /\ incr l2 /\ l = l1 ++ l2)). 
+  - intros.
+    unfold insertion_body.
+    destruct a.
+    destruct l1.
+    + apply Hoare_ret. 
+      tauto.
+    + apply Hoare_choice. 
+      * apply Hoare_assume_bind. 
+        intros. 
+        apply Hoare_ret.
+        apply incr_app_cons; [tauto|]. 
+        simpl; tauto.
+      * apply Hoare_assume_bind. 
+        intros. 
+        apply Hoare_ret.
+        destruct H0 as [? []]. 
+        split; [|split]. 
+        ** subst.
+           rewrite <- app_assoc.
+           apply incr_app_cons. 
+           { apply incr_app_cons_inv1 in H; auto. }
+           { simpl; tauto. } 
+        ** subst. 
+           replace (z :: l1) with ([z] ++ l1) in H2 
+           by reflexivity.
+           apply incr_app_inv2 in H2. 
+           auto. 
+        ** subst. 
+           rewrite <- app_assoc. 
+           reflexivity. 
+  - split; [|split]. 
+    ** simpl; tauto. 
+    ** apply H. 
+    ** reflexivity.
+Qed.
 
 (************)
 (** 习题：  *)
@@ -70,14 +172,32 @@ Theorem ins_sort_perm:
     Hoare
       (ins_sort L)
       (fun l => Permutation L l).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+  intros.
+  unfold ins_sort.
+  apply Hoare_list_iter; [|reflexivity].
+  intros.
+  eapply Hoare_conseq. 
+  2:{ apply insertion_perm. }
+  simpl; intros. 
+  eapply Permutation_trans.
+  2:{ apply H0. }
+  apply Permutation_app;
+  [apply H | reflexivity].
+Qed.
 
 Theorem ins_sort_incr:
   forall L,
     Hoare
       (ins_sort L)
       (fun l => incr l).
-Admitted. (* 请删除这一行_[Admitted]_并填入你的证明，以_[Qed]_结束。 *)
+Proof.
+  intros.
+  unfold ins_sort.
+  apply Hoare_list_iter with (P:= fun _ l => incr l). 
+  intros; apply insertion_incr; auto. 
+  simpl; tauto.
+Qed.
 
 Theorem functional_correctness_ins_sort:
   forall L,
