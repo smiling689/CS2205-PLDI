@@ -44,7 +44,7 @@ PL_FILE_NAMES = \
 	MoreInductiveType.v Logic.v \
 	Monad.v \
 	WhileDExprDenotation.v Kleene.v FixedPoint.v \
-	MonadHoare.v
+	MonadHoare.v MonadHoare2.v
 
 PL_FILES=$(PL_FILE_NAMES:%.v=$(PL_DIR)/%.v)
 
@@ -60,7 +60,9 @@ ASSIGNMENT_FILES=$(ASSIGNMENT_FILE_NAMES:%.v=$(ASSIGNMENT_DIR)/%.v)
 QUIZ_FILE_NAMES = \
 	Quiz0930.v \
 	Quiz1016.v \
-	Quiz1202.v
+	CoqExam.v \
+	Quiz1202.v \
+	Quiz1209.v
 
 QUIZ_FILES=$(QUIZ_FILE_NAMES:%.v=$(QUIZ_DIR)/%.v)
 
